@@ -1,0 +1,91 @@
+@import "gentium.css";
+@import "bitter.css";
+
+body {
+  margin:0;
+  font-family:GentiumW, serif;
+  font-size: 18px;
+  color: #1c1c1c;
+  line-height:1.6;
+  background:#f8f8f8;
+}
+
+.topnav {
+  background:#222;
+  color:white;
+}
+
+.nav-inner {
+  max-width:900px;
+  margin:auto;
+  padding:14px 24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+nav a {
+  color:white;
+  margin-left:20px;
+  text-decoration:none;
+}
+
+nav a:hover {
+  text-decoration:underline;
+}
+
+.content {
+  max-width:580px;
+}
+
+.hero {
+  background:#235281;
+  color:white;
+  text-align:center;
+  padding:30px 20px 60px 20px;
+}
+
+.content {
+  margin:auto;
+  padding:30px 40px;
+  background:white;
+}
+
+h1 {
+  font-family:Bitter, serif;
+  margin: 0 auto;
+  max-width:500px;
+}
+
+h1,h2, h3 {
+  margin-top:1em;
+  text-align:center;
+  font-weight:500;
+}
+
+h2,h3 {
+  color: #0041a5;
+}
+
+.center {
+  text-align:center;
+}
+
+.big {
+  font-size:20px;
+}
+
+footer {
+  text-align:center;
+  padding:30px;
+  color:#777;
+}
+
+audio {
+  width:100%;
+  margin-top:14px;
+}
+
+summary {
+  margin-bottom:6px;
+}
