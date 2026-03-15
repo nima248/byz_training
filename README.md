@@ -4,10 +4,10 @@ Host audio files for use on training.byzison.xyz
 
 # Audacity recipe
 - Drone track: gain -15dB
-    - Full amplitude waveform
+    - Normalise to -1dB
 - Vocal track: gain -3dB
     - Macro:
-        - Normalize to -3dB
+        - Normalize to -1dB
         - Compress
             - Threshold -18dB
             - Makeup gain 0dB
@@ -17,4 +17,7 @@ Host audio files for use on training.byzison.xyz
             - Attack 5.0ms
             - Release 150ms
         - Normalise to -1dB
+- Mix tracks to mono
+- Normalise mix to -3dB
+- Export mono standard quality mp3
 
