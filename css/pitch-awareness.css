@@ -1,0 +1,132 @@
+@font-face {
+  font-family: ezFthora;
+  font-weight: 400;
+  src: url("/assets/fonts/ezFthora.ttf");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: ezPsaltice;
+  font-weight: 400;
+  src: url("/assets/fonts/ezPsaltica.ttf");
+  font-display: swap;
+}
+
+button {
+  color: black;
+  background: #FFFFF0;
+  border: 3px solid #696969;
+  border-radius: 10px;
+  margin: 6px;
+  padding: 4px;
+  line-height: 1;
+  font-family: Bitter, serif;
+  font-weight: 600;
+}
+
+button:hover {
+  background: #EEEEE0;
+  border: 3px solid #595959;
+}
+
+button:active {
+  background: #DDDDD0;
+  border: 3px solid #494949;
+}
+
+button:disabled {
+  background: #EEEEE0;
+  color: #AAAAA0;
+  border: 3px solid #AAAAA0;
+}
+
+hr {
+  margin: 40px 0px;
+  border: 1px solid black;
+}
+
+#trainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+#controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.note-control {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.note-control button {
+  height: 45px;
+  width: 45px;
+  font-size: 1.4em;
+}
+
+#start-btn {
+  padding: 15px;
+}
+
+#note-rows {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#note-rows div {
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+#note-rows div button {
+  visibility: hidden;
+}
+
+#note-rows .note-div-enabled {
+  max-height: 100px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+#note-rows .note-div-enabled button {
+  visibility: visible;
+}
+
+.note-btn {
+  font-size: 1.2em;
+  font-weight: 600;
+  width: 90px;
+  padding: 6px;
+}
+
+.disabled-note-btn-div {
+
+}
+
+.fthora-space {
+  display: inline-block;
+  width: 0.6em;
+}
+
+.enharmonic-fthora {
+  font-family: ezFthora;
+  font-size: 150%;
+  position: absolute;
+  transform: translate(30px, -40px);
+}
+
+.ison-slot {
+  font-family: ezPsaltica;
+  font-size: 1.7em;
+  position: absolute;
+  transform: translate(-45px, 3px);
+}

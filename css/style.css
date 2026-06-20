@@ -8,6 +8,13 @@
   font-display: optional;
 }
 
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
 body {
   margin:0;
   font-family:GentiumW, serif;
@@ -47,7 +54,7 @@ body {
 }
 
 /* MOBILE */
-@media (max-width: 600px) {
+@media (max-width: 720px) {
   #nav-links {
     display: none;
     flex-direction: column;
