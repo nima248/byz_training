@@ -52,10 +52,45 @@ hr {
   margin-top: 40px;
 }
 
-#controls {
+#panel-container {
+  position: relative;
+}
+
+#setup-panel {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+}
+
+#game-panel {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+#setup-panel,
+#game-panel {
+  transition: transform 0.3s ease-out, opacity 0.2s ease-out;
+}
+
+#setup-panel.game-in-progress,
+#game-panel:not(.game-in-progress) {
+  opacity: 0;
+  z-index: -1;
+  transform: translateX(-100px);
+}
+
+#setup-panel.game-in-progress button,
+#game-panel:not(.game-in-progress) button {
+  disabled: true;
+}
+
+#setup-panel:not(.game-in-progress),
+#game-panel.game-in-progress {
+  opacity: 1;
 }
 
 .note-control {
@@ -66,12 +101,13 @@ hr {
 }
 
 .note-control button {
-  height: 45px;
-  width: 45px;
+  height: 35px;
+  width: 35px;
   font-size: 1.4em;
 }
 
-#start-btn {
+#start-btn,
+#stop-btn {
   padding: 15px;
 }
 
@@ -108,10 +144,6 @@ hr {
   padding: 6px;
 }
 
-.disabled-note-btn-div {
-
-}
-
 .fthora-space {
   display: inline-block;
   width: 0.6em;
@@ -129,4 +161,10 @@ hr {
   font-size: 1.7em;
   position: absolute;
   transform: translate(-45px, 3px);
+  transition: opacity 0.2s ease;
+  opacity: 0;
+}
+
+.ison-slot.show {
+  opacity: 1;
 }

@@ -17,13 +17,20 @@ const NOTES = [
 ];
 
 NOTE_DIV_ENABLED_CLASS = "note-div-enabled";
+GAME_IN_PROGRESS_CLASS = "game-in-progress";
+ISON_SHOW_CLASS = "show";
 
-const lowestDownBtn = document.querySelector("#lowest-down");
-const lowestUpBtn = document.querySelector("#lowest-up");
-const highestDownBtn = document.querySelector("#highest-down");
-const highestUpBtn = document.querySelector("#highest-up");
-const isonDownBtn = document.querySelector("#ison-down");
-const isonUpBtn = document.querySelector("#ison-up");
+const setupPanel = document.querySelector("#setup-panel");
+const gamePanel = document.querySelector("#game-panel");
+
+const lowestDownBtn = document.querySelector("#lowest-down-btn");
+const lowestUpBtn = document.querySelector("#lowest-up-btn");
+const highestDownBtn = document.querySelector("#highest-down-btn");
+const highestUpBtn = document.querySelector("#highest-up-btn");
+const isonDownBtn = document.querySelector("#ison-down-btn");
+const isonUpBtn = document.querySelector("#ison-up-btn");
+const startBtn = document.querySelector("#start-btn");
+const stopBtn = document.querySelector("#stop-btn");
 
 function indexOfNote(note) {
   if (NOTES.includes(note)) {
@@ -48,11 +55,11 @@ function enableNote(noteIndex, enable = true) {
 function setIsonNote(noteIndex) {
   const oldNoteName = NOTES[isonNoteIndex];
   const oldIsonSlot = document.querySelector(`#row-${oldNoteName} .ison-slot`);
-  oldIsonSlot.innerHTML = "";
+  oldIsonSlot.classList.remove(ISON_SHOW_CLASS);
   isonNoteIndex = noteIndex;
   const newNoteName = NOTES[isonNoteIndex];
   const newIsonSlot = document.querySelector(`#row-${newNoteName} .ison-slot`);
-  newIsonSlot.innerHTML = "0";
+  newIsonSlot.classList.add(ISON_SHOW_CLASS);
 }
 
 function calculateNoteControlButtons() {
@@ -62,6 +69,16 @@ function calculateNoteControlButtons() {
   lowestUpBtn.disabled = highestNoteIndex - 1 === lowestNoteIndex;
   isonDownBtn.disabled = isonNoteIndex === lowestNoteIndex;
   isonUpBtn.disabled = isonNoteIndex === highestNoteIndex;
+}
+
+function startGame() {
+  setupPanel.classList.add(GAME_IN_PROGRESS_CLASS);
+  gamePanel.classList.add(GAME_IN_PROGRESS_CLASS);
+}
+
+function stopGame() {
+  setupPanel.classList.remove(GAME_IN_PROGRESS_CLASS);
+  gamePanel.classList.remove(GAME_IN_PROGRESS_CLASS);
 }
 
 lowestDownBtn.addEventListener("click", () => {
@@ -132,6 +149,14 @@ isonUpBtn.addEventListener("click", () => {
   }
   setIsonNote(isonNoteIndex + 1);
   calculateNoteControlButtons();
+});
+
+startBtn.addEventListener("click", () => {
+  startGame();
+});
+
+stopBtn.addEventListener("click", () => {
+  stopGame();
 });
 
 let lowestNoteIndex = indexOfNote("ni");
