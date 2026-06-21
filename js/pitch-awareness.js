@@ -3,6 +3,7 @@ import { Sampler } from "../lib/byz-audio/src/Sampler.js";
 import { ScaleManager } from "../lib/byz-audio/src/ScaleManager.js";
 
 const NOTES = [
+  "low-ga",
   "low-di",
   "low-ke",
   "zo-flat",
@@ -18,6 +19,8 @@ const NOTES = [
   "high-ni",
   "high-pa",
   "high-bou",
+  "high-ga",
+  "high-di",
 ];
 
 let NOTE_DIV_ENABLED_CLASS = "note-div-enabled";
@@ -40,9 +43,18 @@ const sampleBank = new SampleBank(
   "https://audio.byzison.xyz/",
   "manifest.json",
 );
+const isonSampler = new Sampler(sampleBank, "vox1", {
+  nVoices: 3,
+});
+const guitarSampler = new Sampler(sampleBank, "classical_guitar", {
+  nVoices: 1,
+});
+const scaleManager = new ScaleManager();
+let melodySampler = guitarSampler;
 
-const isonSampler = new Sampler(sampleBank, "vox1", { nVoices = 3, });
-const noteSampler = new Sampler(sampleBank, "classical_guitar", { nVoices = 1, });
+sampleBank.initialise();
+isonSampler.initialise();
+guitarSampler.initialise();
 
 function indexOfNote(note) {
   if (NOTES.includes(note)) {
@@ -57,10 +69,8 @@ function enableNote(noteIndex, enable = true) {
   const noteDiv = document.querySelector(`#row-${noteName}`);
   if (enable) {
     noteDiv.classList.add(NOTE_DIV_ENABLED_CLASS);
-    console.debug(`enabled note ${noteName}`);
   } else {
     noteDiv.classList.remove(NOTE_DIV_ENABLED_CLASS);
-    console.debug(`disabled note ${noteName}`);
   }
 }
 
@@ -83,9 +93,43 @@ function calculateNoteControlButtons() {
   isonUpBtn.disabled = isonNoteIndex === highestNoteIndex;
 }
 
-function startGame() {
+async function startGame() {
   setupPanel.classList.add(GAME_IN_PROGRESS_CLASS);
   gamePanel.classList.add(GAME_IN_PROGRESS_CLASS);
+
+  let notes = [];
+  for (let i = lowestNoteIndex; i <= highestNoteIndex; i++) {
+    notes.push(NOTES[i]);
+  }
+  console.debug(`start game: notes: ${notes}`);
+  const noteFreqs = calculateNoteFrequencies(notes);
+  console.debug(noteFreqs);
+  let freqs = [];
+  noteFreqs.forEach((freq, note, map) => {
+    freqs.push(freq);
+  });
+  await melodySampler.loadSound(freqs);
+  console.log("Sounds loaded");
+}
+
+function calculateNoteFrequencies(notes) {
+  let noteFreqs = new Map();
+  notes.forEach((note) => {
+    let octave = 0;
+    if (["low-ga", "low-di", "low-ke", "zo-flat", "zo"].includes(note)) {
+      octave = -1;
+    } else if (
+      ["high-ni", "high-pa", "high-bou", "high-ga", "high-di"].includes(note)
+    ) {
+      octave = 1;
+    }
+    const freq = scaleManager.getFreq(
+      note.replace("high-", "").replace("low-", "").replace("-", "_"),
+      octave,
+    );
+    noteFreqs.set(note, freq);
+  });
+  return noteFreqs;
 }
 
 function stopGame() {
@@ -174,9 +218,6 @@ stopBtn.addEventListener("click", () => {
 let lowestNoteIndex = indexOfNote("ni");
 let highestNoteIndex = indexOfNote("pa");
 let isonNoteIndex = lowestNoteIndex;
-
-console.log(lowestNoteIndex);
-console.log(highestNoteIndex);
 
 for (let i = lowestNoteIndex; i <= highestNoteIndex; i++) {
   enableNote(i);
