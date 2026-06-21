@@ -1,3 +1,7 @@
+import { SampleBank } from "../lib/byz-audio/src/SampleBank.js";
+import { Sampler } from "../lib/byz-audio/src/Sampler.js";
+import { ScaleManager } from "../lib/byz-audio/src/ScaleManager.js";
+
 const NOTES = [
   "low-di",
   "low-ke",
@@ -16,9 +20,9 @@ const NOTES = [
   "high-bou",
 ];
 
-NOTE_DIV_ENABLED_CLASS = "note-div-enabled";
-GAME_IN_PROGRESS_CLASS = "game-in-progress";
-ISON_SHOW_CLASS = "show";
+let NOTE_DIV_ENABLED_CLASS = "note-div-enabled";
+let GAME_IN_PROGRESS_CLASS = "game-in-progress";
+let ISON_SHOW_CLASS = "show";
 
 const setupPanel = document.querySelector("#setup-panel");
 const gamePanel = document.querySelector("#game-panel");
@@ -31,6 +35,14 @@ const isonDownBtn = document.querySelector("#ison-down-btn");
 const isonUpBtn = document.querySelector("#ison-up-btn");
 const startBtn = document.querySelector("#start-btn");
 const stopBtn = document.querySelector("#stop-btn");
+
+const sampleBank = new SampleBank(
+  "https://audio.byzison.xyz/",
+  "manifest.json",
+);
+
+const isonSampler = new Sampler(sampleBank, "vox1", { nVoices = 3, });
+const noteSampler = new Sampler(sampleBank, "classical_guitar", { nVoices = 1, });
 
 function indexOfNote(note) {
   if (NOTES.includes(note)) {
