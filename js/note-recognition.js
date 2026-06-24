@@ -1,5 +1,6 @@
 import { SampleBank } from "../lib/byz-audio/src/SampleBank.js";
-import { Sampler } from "../lib/byz-audio/src/Sampler.js";
+import { BasicSampler } from "../lib/byz-audio/src/BasicSampler.js";
+import { LayerSampler } from "../lib/byz-audio/src/LayerSampler.js";
 import { ScaleManager } from "../lib/byz-audio/src/ScaleManager.js";
 
 const NOTES = [
@@ -23,9 +24,10 @@ const NOTES = [
   "high-di",
 ];
 
-let NOTE_DIV_ENABLED_CLASS = "note-div-enabled";
-let GAME_IN_PROGRESS_CLASS = "game-in-progress";
-let ISON_SHOW_CLASS = "show";
+const NOTE_DIV_ENABLED_CLASS = "note-div-enabled";
+const GAME_IN_PROGRESS_CLASS = "game-in-progress";
+const ISON_SHOW_CLASS = "show";
+const ISON_VOLUME = 0.4;
 
 const setupPanel = document.querySelector("#setup-panel");
 const gamePanel = document.querySelector("#game-panel");
@@ -39,22 +41,26 @@ const isonUpBtn = document.querySelector("#ison-up-btn");
 const startBtn = document.querySelector("#start-btn");
 const stopBtn = document.querySelector("#stop-btn");
 
+const noteButtons = document.querySelector("#note-rows");
+
 const sampleBank = new SampleBank(
   "https://audio.byzison.xyz/",
   "manifest.json",
 );
-const isonSampler = new Sampler(sampleBank, "vox1", {
+const isonSampler = new LayerSampler(sampleBank, "vox1", {
+  volume: ISON_VOLUME,
   nVoices: 3,
 });
-const guitarSampler = new Sampler(sampleBank, "classical_guitar", {
+const guitarSampler = new BasicSampler(sampleBank, "classical_guitar", {
   nVoices: 1,
+  monophonic: true,
 });
 const scaleManager = new ScaleManager();
 let melodySampler = guitarSampler;
 
 sampleBank.initialise();
 isonSampler.initialise();
-guitarSampler.initialise();
+melodySampler.initialise();
 
 function indexOfNote(note) {
   if (NOTES.includes(note)) {
@@ -93,7 +99,7 @@ function calculateNoteControlButtons() {
   isonUpBtn.disabled = isonNoteIndex === highestNoteIndex;
 }
 
-async function startGame() {
+async function startGame(nRounds = 10) {
   setupPanel.classList.add(GAME_IN_PROGRESS_CLASS);
   gamePanel.classList.add(GAME_IN_PROGRESS_CLASS);
 
@@ -108,12 +114,22 @@ async function startGame() {
   noteFreqs.forEach((freq, note, map) => {
     freqs.push(freq);
   });
-  await melodySampler.loadSound(freqs);
+  const isonNote = NOTES[isonNoteIndex];
+  const isonFreq = calculateNoteFrequencies([isonNote]).get(isonNote);
+  await Promise.all([
+    melodySampler.loadSound(freqs),
+    isonSampler.loadSound([isonFreq]),
+  ]);
   console.log("Sounds loaded");
+
+  isonSampler.playFrequency(isonFreq);
+
+  for (let round = 0; round < nRounds; round++) {}
 }
 
 function calculateNoteFrequencies(notes) {
   let noteFreqs = new Map();
+  console.debug(notes);
   notes.forEach((note) => {
     let octave = 0;
     if (["low-ga", "low-di", "low-ke", "zo-flat", "zo"].includes(note)) {
@@ -135,6 +151,7 @@ function calculateNoteFrequencies(notes) {
 function stopGame() {
   setupPanel.classList.remove(GAME_IN_PROGRESS_CLASS);
   gamePanel.classList.remove(GAME_IN_PROGRESS_CLASS);
+  isonSampler.stop();
 }
 
 lowestDownBtn.addEventListener("click", () => {
@@ -213,6 +230,18 @@ startBtn.addEventListener("click", () => {
 
 stopBtn.addEventListener("click", () => {
   stopGame();
+});
+
+noteButtons.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button) {
+    return;
+  }
+  const note = button.id.replace("btn-", "");
+  console.log(`Button: ${note}`);
+  const freq = calculateNoteFrequencies([note]).get(note);
+  console.log(freq);
+  melodySampler.playFrequency(freq);
 });
 
 let lowestNoteIndex = indexOfNote("ni");
