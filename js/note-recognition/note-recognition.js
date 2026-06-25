@@ -31,7 +31,7 @@ const NOTES = [
 const COLORS = {
   played: "180 190 255",
   correct: "30 240 40",
-  incorrect: "120 40 20",
+  incorrect: "190 40 20",
 };
 
 const NOTE_DIV_ENABLED_CLASS = "note-div-enabled";
@@ -119,21 +119,8 @@ async function startRound() {
   gamePanel.disabled = false;
   enableNoteButtons(false);
 
-  let notes = [];
-  for (let i = lowestNoteIndex; i <= highestNoteIndex; i++) {
-    notes.push(NOTES[i]);
-  }
-  const isonNote = NOTES[isonNoteIndex];
-
-  // Load audio
-  let freqs = [];
-  notes.forEach((note) => {
-    freqs.push(noteFrequency(note));
-  });
-  await Promise.all([
-    melodySampler.loadSound(freqs),
-    isonSampler.loadSound([noteFrequency(isonNote)]),
-  ]);
+  const [notes, isonNote] = getActiveNotes();
+  await loadAudio(notes, isonNote);
 
   console.debug(`initialise round: notes: ${notes}`);
   gameRound = new GameRound({
@@ -146,6 +133,26 @@ async function startRound() {
     playIsonFirst: true,
   });
   await gameRound.playRound();
+}
+
+function getActiveNotes() {
+  let notes = [];
+  for (let i = lowestNoteIndex; i <= highestNoteIndex; i++) {
+    notes.push(NOTES[i]);
+  }
+  const isonNote = NOTES[isonNoteIndex];
+  return [notes, isonNote];
+}
+
+async function loadAudio(notes, isonNote) {
+  let freqs = [];
+  notes.forEach((note) => {
+    freqs.push(noteFrequency(note));
+  });
+  await Promise.all([
+    melodySampler.loadSound(freqs),
+    isonSampler.loadSound([noteFrequency(isonNote)]),
+  ]);
 }
 
 function playIsonCallback(note) {
@@ -197,24 +204,32 @@ function stopGame() {
   gamePanel.classList.remove(GAME_IN_PROGRESS_CLASS);
   setupPanel.disabled = false;
   gamePanel.disabled = true;
+  enableNoteButtons(true);
   isonSampler.stop();
   melodySampler.stop();
   gameRound.stop();
+  gameRound = null;
+}
+
+if (window.matchMedia("(pointer: coarse)").matches) {
+  document.querySelectorAll("button").forEach((button) => {
+    button.addEventListener("touchend", () => {
+      button.blur();
+      console.log(button.id);
+    });
+  });
 }
 
 lowestDownBtn.addEventListener("click", () => {
-  event.stopPropagation();
   if (lowestNoteIndex === 0) {
     console.error("Tried to lower lowestNoteIndex below 0!");
     return;
   }
   lowestNoteIndex -= 1;
   enableNote(lowestNoteIndex);
-  calculateNoteControlButtons();
 });
 
 lowestUpBtn.addEventListener("click", () => {
-  event.stopPropagation();
   if (lowestNoteIndex + 1 === highestNoteIndex) {
     console.error("Tried to raise lowestNoteIndex equal to highestNoteIndex!");
     return;
@@ -224,11 +239,9 @@ lowestUpBtn.addEventListener("click", () => {
   if (isonNoteIndex < lowestNoteIndex) {
     setIsonNote(lowestNoteIndex);
   }
-  calculateNoteControlButtons();
 });
 
 highestDownBtn.addEventListener("click", () => {
-  event.stopPropagation();
   if (highestNoteIndex - 1 === lowestNoteIndex) {
     console.error("Tried to lower highestNoteIndex equal to lowestNoteIndex!");
     return;
@@ -238,38 +251,51 @@ highestDownBtn.addEventListener("click", () => {
   if (isonNoteIndex > highestNoteIndex) {
     setIsonNote(highestNoteIndex);
   }
-  calculateNoteControlButtons();
 });
 
 highestUpBtn.addEventListener("click", () => {
-  event.stopPropagation();
   if (highestNoteIndex > NOTES.length) {
     console.error(`Tried to raise highestNoteIndex past ${NOTES.length}!`);
     return;
   }
   highestNoteIndex += 1;
   enableNote(highestNoteIndex);
-  calculateNoteControlButtons();
 });
 
 isonDownBtn.addEventListener("click", () => {
-  event.stopPropagation();
   if (isonNoteIndex === lowestNoteIndex) {
     console.error(`Tried to lower ison below lowestNoteIndex!`);
     return;
   }
   setIsonNote(isonNoteIndex - 1);
-  calculateNoteControlButtons();
 });
 
 isonUpBtn.addEventListener("click", () => {
-  event.stopPropagation();
   if (isonNoteIndex === highestNoteIndex) {
     console.error(`Tried to raise ison above highestNoteIndex!`);
     return;
   }
   setIsonNote(isonNoteIndex + 1);
-  calculateNoteControlButtons();
+});
+
+setupPanel.addEventListener("click", (event) => {
+  const button = event.target.closest("button");
+  if (!button) {
+    return;
+  }
+  if (
+    [
+      "highest-down-btn",
+      "highest-up-btn",
+      "lowest-down-btn",
+      "lowest-up-btn",
+      "ison-down-btn",
+      "ison-up-btn",
+    ].includes(button.id)
+  ) {
+    loadAudio(...getActiveNotes());
+    calculateNoteControlButtons();
+  }
 });
 
 startBtn.addEventListener("click", async () => {
@@ -304,8 +330,10 @@ let lowestNoteIndex = indexOfNote("ni");
 let highestNoteIndex = indexOfNote("pa");
 let isonNoteIndex = lowestNoteIndex;
 
+setIsonNote(isonNoteIndex);
 for (let i = lowestNoteIndex; i <= highestNoteIndex; i++) {
   enableNote(i);
 }
-setIsonNote(isonNoteIndex);
+
+loadAudio(...getActiveNotes());
 calculateNoteControlButtons();

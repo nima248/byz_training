@@ -22,6 +22,7 @@ export class GameRound {
     this._roundStarted = false;
     this._stopped = false;
     this._waitingResolve = null;
+    this._nCorrectAnswers = 0;
   }
 
   async playRound() {
@@ -77,6 +78,7 @@ export class GameRound {
       valid = true;
       if (answerNote === this._questionNote) {
         correct = true;
+        this._nCorrectAnswers++;
       }
       this._readyForAnswerCallback(false);
       this._waitingResolve();
