@@ -1,3 +1,7 @@
+:root {
+    --btn-bg: #FFFFF0;
+}
+
 @font-face {
   font-family: ezFthora;
   font-weight: 400;
@@ -13,8 +17,9 @@
 }
 
 button {
+  position: relative;
   color: black;
-  background: #FFFFF0;
+  background: var(--btn-bg);
   border: 3px solid #696969;
   border-radius: 10px;
   margin: 6px;
@@ -38,6 +43,37 @@ button:disabled {
   background: #EEEEE0;
   color: #AAAAA0;
   border: 3px solid #AAAAA0;
+}
+
+.note-btn::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  background: rgb(var(--pulse-color) / 0.8);
+  opacity: 0;
+  pointer-events: none;
+  filter: blur(6px);
+}
+
+.note-btn.pulse::after {
+  animation: pulse-overlay 0.9s ease-out;
+}
+
+@keyframes pulse-overlay {
+  10% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.button-pulse {
+  animation: pulse 0.7s ease-out;
 }
 
 hr {
@@ -83,11 +119,6 @@ hr {
   transform: translateX(-100px);
 }
 
-#setup-panel.game-in-progress button,
-#game-panel:not(.game-in-progress) button {
-  disabled: true;
-}
-
 #setup-panel:not(.game-in-progress),
 #game-panel.game-in-progress {
   opacity: 1;
@@ -98,6 +129,7 @@ hr {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  text-align: center;
 }
 
 .note-control button {
@@ -119,7 +151,6 @@ hr {
 
 #note-rows div {
   max-height: 0px;
-  overflow: hidden;
   transition: max-height 0.3s ease;
 }
 
@@ -129,7 +160,6 @@ hr {
 
 #note-rows .note-div-enabled {
   max-height: 100px;
-  overflow: hidden;
   transition: max-height 0.3s ease;
 }
 

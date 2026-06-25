@@ -1,7 +1,10 @@
-import { SampleBank } from "../lib/byz-audio/src/SampleBank.js";
-import { BasicSampler } from "../lib/byz-audio/src/BasicSampler.js";
-import { LayerSampler } from "../lib/byz-audio/src/LayerSampler.js";
-import { ScaleManager } from "../lib/byz-audio/src/ScaleManager.js";
+import { SampleBank } from "../../lib/byz-audio/src/SampleBank.js";
+import { BasicSampler } from "../../lib/byz-audio/src/BasicSampler.js";
+import { LayerSampler } from "../../lib/byz-audio/src/LayerSampler.js";
+import { ScaleManager } from "../../lib/byz-audio/src/ScaleManager.js";
+import * as math from "../../lib/byz-audio/src/math.js";
+
+import { GameRound } from "./GameRound.js";
 
 const NOTES = [
   "low-ga",
@@ -24,8 +27,16 @@ const NOTES = [
   "high-di",
 ];
 
+// Uses CSS rgb syntax
+const COLORS = {
+  played: "180 190 255",
+  correct: "30 240 40",
+  incorrect: "120 40 20",
+};
+
 const NOTE_DIV_ENABLED_CLASS = "note-div-enabled";
 const GAME_IN_PROGRESS_CLASS = "game-in-progress";
+const PULSE_ANIMATION_CLASS = "pulse";
 const ISON_SHOW_CLASS = "show";
 const ISON_VOLUME = 0.4;
 
@@ -41,7 +52,8 @@ const isonUpBtn = document.querySelector("#ison-up-btn");
 const startBtn = document.querySelector("#start-btn");
 const stopBtn = document.querySelector("#stop-btn");
 
-const noteButtons = document.querySelector("#note-rows");
+const noteButtonContainer = document.querySelector("#note-rows");
+const noteButtons = document.querySelectorAll(".note-btn");
 
 const sampleBank = new SampleBank(
   "https://audio.byzison.xyz/",
@@ -57,6 +69,7 @@ const guitarSampler = new BasicSampler(sampleBank, "classical_guitar", {
 });
 const scaleManager = new ScaleManager();
 let melodySampler = guitarSampler;
+let gameRound = null;
 
 sampleBank.initialise();
 isonSampler.initialise();
@@ -99,59 +112,94 @@ function calculateNoteControlButtons() {
   isonUpBtn.disabled = isonNoteIndex === highestNoteIndex;
 }
 
-async function startGame(nRounds = 10) {
+async function startRound() {
   setupPanel.classList.add(GAME_IN_PROGRESS_CLASS);
   gamePanel.classList.add(GAME_IN_PROGRESS_CLASS);
+  setupPanel.disabled = true;
+  gamePanel.disabled = false;
+  enableNoteButtons(false);
 
   let notes = [];
   for (let i = lowestNoteIndex; i <= highestNoteIndex; i++) {
     notes.push(NOTES[i]);
   }
-  console.debug(`start game: notes: ${notes}`);
-  const noteFreqs = calculateNoteFrequencies(notes);
-  console.debug(noteFreqs);
-  let freqs = [];
-  noteFreqs.forEach((freq, note, map) => {
-    freqs.push(freq);
-  });
   const isonNote = NOTES[isonNoteIndex];
-  const isonFreq = calculateNoteFrequencies([isonNote]).get(isonNote);
+
+  // Load audio
+  let freqs = [];
+  notes.forEach((note) => {
+    freqs.push(noteFrequency(note));
+  });
   await Promise.all([
     melodySampler.loadSound(freqs),
-    isonSampler.loadSound([isonFreq]),
+    isonSampler.loadSound([noteFrequency(isonNote)]),
   ]);
-  console.log("Sounds loaded");
 
-  isonSampler.playFrequency(isonFreq);
-
-  for (let round = 0; round < nRounds; round++) {}
+  console.debug(`initialise round: notes: ${notes}`);
+  gameRound = new GameRound({
+    melodyNotes: notes,
+    isonNote: isonNote,
+    nQuestions: 10,
+    playIsonCallback: playIsonCallback,
+    playMelodyCallback: playMelodyCallback,
+    readyForAnswerCallback: readyForAnswerCallback,
+    playIsonFirst: true,
+  });
+  await gameRound.playRound();
 }
 
-function calculateNoteFrequencies(notes) {
-  let noteFreqs = new Map();
-  console.debug(notes);
-  notes.forEach((note) => {
-    let octave = 0;
-    if (["low-ga", "low-di", "low-ke", "zo-flat", "zo"].includes(note)) {
-      octave = -1;
-    } else if (
-      ["high-ni", "high-pa", "high-bou", "high-ga", "high-di"].includes(note)
-    ) {
-      octave = 1;
-    }
-    const freq = scaleManager.getFreq(
-      note.replace("high-", "").replace("low-", "").replace("-", "_"),
-      octave,
-    );
-    noteFreqs.set(note, freq);
+function playIsonCallback(note) {
+  isonSampler.playFrequency(noteFrequency(note));
+}
+
+function playMelodyCallback(note, flashButton) {
+  melodySampler.playFrequency(noteFrequency(note));
+  if (flashButton) {
+    const button = document.querySelector(`#${note}-btn`);
+    pulseButton(button, COLORS["played"]);
+  }
+}
+
+function readyForAnswerCallback(ready) {
+  enableNoteButtons(ready);
+}
+
+function enableNoteButtons(enable) {
+  noteButtons.forEach((button) => {
+    button.disabled = !enable;
   });
-  return noteFreqs;
+}
+
+function pulseButton(button, color) {
+  button.style.setProperty("--pulse-color", color);
+  button.classList.remove(PULSE_ANIMATION_CLASS);
+  void button.offsetWidth;
+  button.classList.add(PULSE_ANIMATION_CLASS);
+}
+
+function noteFrequency(note) {
+  let octave = 0;
+  if (["low-ga", "low-di", "low-ke", "zo-flat", "zo"].includes(note)) {
+    octave = -1;
+  } else if (
+    ["high-ni", "high-pa", "high-bou", "high-ga", "high-di"].includes(note)
+  ) {
+    octave = 1;
+  }
+  return scaleManager.getFreq(
+    note.replace("high-", "").replace("low-", "").replace("-", "_"),
+    octave,
+  );
 }
 
 function stopGame() {
   setupPanel.classList.remove(GAME_IN_PROGRESS_CLASS);
   gamePanel.classList.remove(GAME_IN_PROGRESS_CLASS);
+  setupPanel.disabled = false;
+  gamePanel.disabled = true;
   isonSampler.stop();
+  melodySampler.stop();
+  gameRound.stop();
 }
 
 lowestDownBtn.addEventListener("click", () => {
@@ -224,24 +272,32 @@ isonUpBtn.addEventListener("click", () => {
   calculateNoteControlButtons();
 });
 
-startBtn.addEventListener("click", () => {
-  startGame();
+startBtn.addEventListener("click", async () => {
+  await startRound();
 });
 
 stopBtn.addEventListener("click", () => {
   stopGame();
 });
 
-noteButtons.addEventListener("click", (event) => {
+noteButtonContainer.addEventListener("click", (event) => {
   const button = event.target.closest("button");
   if (!button) {
     return;
   }
-  const note = button.id.replace("btn-", "");
-  console.log(`Button: ${note}`);
-  const freq = calculateNoteFrequencies([note]).get(note);
-  console.log(freq);
-  melodySampler.playFrequency(freq);
+  const note = button.id.replace("-btn", "");
+  if (gameRound != null) {
+    const [valid, correct] = gameRound.submitAnswer(note);
+    if (valid) {
+      if (correct) {
+        pulseButton(button, COLORS["correct"]);
+      } else {
+        pulseButton(button, COLORS["incorrect"]);
+      }
+    }
+  } else {
+    melodySampler.playFrequency(noteFrequency(note));
+  }
 });
 
 let lowestNoteIndex = indexOfNote("ni");
