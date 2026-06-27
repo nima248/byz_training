@@ -1,5 +1,6 @@
 :root {
     --btn-bg: #FFFFF0;
+    --btn-bg-hover: #EBEBD7;
 }
 
 @font-face {
@@ -35,7 +36,7 @@ button {
 }
 @media (hover: hover) and (pointer: fine) {
   button:hover {
-    background: #F5F5F5;
+    background: var(--btn-bg-hover);
     border-color: #595959;
   }
 }
@@ -67,7 +68,7 @@ button:disabled {
 }
 
 .note-btn.pulse::after {
-  animation: pulse-overlay 0.9s ease-out;
+  animation: pulse-overlay 1.2s ease-out;
 }
 
 @keyframes pulse-overlay {
@@ -95,30 +96,23 @@ hr {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  margin-top: 40px;
+  margin-top: 20px;
 }
 
 #panel-container {
   position: relative;
 }
 
-#setup-panel {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-
 #game-panel {
   position: absolute;
   inset: 0;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
 }
 
 #setup-panel,
 #game-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   transition: transform 0.3s ease-out, opacity 0.2s ease-out;
 }
 
@@ -134,6 +128,15 @@ hr {
   opacity: 1;
 }
 
+.note-control-label {
+  margin-bottom: 0px;
+  text-align: center;
+}
+
+.note-control-label:not(:first-child) {
+  margin-top: 12px;
+}
+
 .note-control {
   display: flex;
   flex-direction: row;
@@ -145,12 +148,35 @@ hr {
 .note-control button {
   height: 35px;
   width: 35px;
-  font-size: 1.4em;
+  margin-top: 0px;
+}
+
+.minus-symbol {
+  position: relative;
+  font-size: 1.8em;
+  top: -6px;
+}
+
+.plus-symbol {
+  position: relative;
+  font-size: 1.5em;
+  top: -2px;
+}
+
+.note-display {
+  width: 75px;
+  line-height: 1;
+  font-family: Bitter, serif;
+  font-size: 1.2em;
+  font-weight: 600;
+  margin-top: 0px;
+  transform: translateY(-2px);
 }
 
 #start-btn,
 #stop-btn {
   padding: 15px;
+  margin-top: 15px;
 }
 
 #note-rows {
@@ -189,14 +215,14 @@ hr {
 
 .fthora-space {
   display: inline-block;
-  width: 0.6em;
+  width: 0.8em;
 }
 
 .enharmonic-fthora {
   font-family: ezFthora;
   font-size: 150%;
   position: absolute;
-  transform: translate(30px, -42px);
+  transform: translate(26px, -42px);
 }
 
 .ison-slot {

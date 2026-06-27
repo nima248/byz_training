@@ -43,12 +43,15 @@ const ISON_VOLUME = 0.4;
 const setupPanel = document.querySelector("#setup-panel");
 const gamePanel = document.querySelector("#game-panel");
 
-const lowestDownBtn = document.querySelector("#lowest-down-btn");
-const lowestUpBtn = document.querySelector("#lowest-up-btn");
 const highestDownBtn = document.querySelector("#highest-down-btn");
 const highestUpBtn = document.querySelector("#highest-up-btn");
+const highestNoteDisplay = document.querySelector("#highest-note-display");
+const lowestDownBtn = document.querySelector("#lowest-down-btn");
+const lowestUpBtn = document.querySelector("#lowest-up-btn");
+const lowestNoteDisplay = document.querySelector("#lowest-note-display");
 const isonDownBtn = document.querySelector("#ison-down-btn");
 const isonUpBtn = document.querySelector("#ison-up-btn");
+const isonNoteDisplay = document.querySelector("#ison-note-display");
 const startBtn = document.querySelector("#start-btn");
 const stopBtn = document.querySelector("#stop-btn");
 
@@ -103,13 +106,22 @@ function setIsonNote(noteIndex) {
   newIsonSlot.classList.add(ISON_SHOW_CLASS);
 }
 
-function calculateNoteControlButtons() {
+function updateSetupPanelUI() {
   highestDownBtn.disabled = highestNoteIndex - 1 === lowestNoteIndex;
   highestUpBtn.disabled = highestNoteIndex === NOTES.length - 1;
+  updateSetupPanelNoteDisplay(highestNoteDisplay, highestNoteIndex);
   lowestDownBtn.disabled = lowestNoteIndex === 0;
   lowestUpBtn.disabled = highestNoteIndex - 1 === lowestNoteIndex;
+  updateSetupPanelNoteDisplay(lowestNoteDisplay, lowestNoteIndex);
   isonDownBtn.disabled = isonNoteIndex === lowestNoteIndex;
   isonUpBtn.disabled = isonNoteIndex === highestNoteIndex;
+  updateSetupPanelNoteDisplay(isonNoteDisplay, isonNoteIndex);
+}
+
+function updateSetupPanelNoteDisplay(displayElement, noteIndex) {
+  const noteName = NOTES[noteIndex];
+  const noteBtn = document.querySelector(`#${noteName}-btn`);
+  displayElement.innerHTML = noteBtn.innerHTML;
 }
 
 async function startRound() {
@@ -294,7 +306,7 @@ setupPanel.addEventListener("click", (event) => {
     ].includes(button.id)
   ) {
     loadAudio(...getActiveNotes());
-    calculateNoteControlButtons();
+    updateSetupPanelUI();
   }
 });
 
@@ -336,4 +348,4 @@ for (let i = lowestNoteIndex; i <= highestNoteIndex; i++) {
 }
 
 loadAudio(...getActiveNotes());
-calculateNoteControlButtons();
+updateSetupPanelUI();
