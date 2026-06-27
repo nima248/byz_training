@@ -1,6 +1,20 @@
 :root {
     --btn-bg: #FFFFF0;
-    --btn-bg-hover: #EBEBD7;
+    --btn-bg-hover: #F0F0D7;
+    --btn-border: #696969;
+    --btn-border-hover: #595959;
+
+    --stop-btn-bg: #FFC5C5;
+    --stop-btn-bg-hover: #EBABAB;
+    --stop-btn-border: #795959;
+    --stop-btn-border-hover: #694949;
+
+    --btn-bg-disabled: #E5E5E5;
+    --btn-color-disabled: #AAAAA0;
+    --btn-border-disabled: #AAAAA0;
+
+    --btn-bg-active: #D5D5C1;
+    --btn-border-active: #42423A;
 }
 
 @font-face {
@@ -21,7 +35,7 @@ button {
   position: relative;
   color: black;
   background: var(--btn-bg);
-  border: 3px solid #696969;
+  border: 3px solid var(--btn-border);
   border-radius: 10px;
   margin: 3px;
   padding: 4px;
@@ -34,22 +48,16 @@ button {
     color 0.13s ease,
     border-color 0.13s ease;
 }
-@media (hover: hover) and (pointer: fine) {
-  button:hover {
-    background: var(--btn-bg-hover);
-    border-color: #595959;
-  }
-}
-
-button:active {
-  background: #DDDDD0;
-  border-color: #494949;
-}
 
 button:disabled {
-  background: #E5E5E5;
-  color: #AAAAA0;
-  border-color: #AAAAA0;
+  background: var(--btn-bg-disabled);
+  color: var(--btn-color-disabled);
+  border-color: var(--btn-border-disabled);
+}
+
+button:enabled:active {
+  background: var(--btn-bg-active);
+  border-color: var(--btn-border-active);
 }
 
 .note-btn:disabled {
@@ -59,8 +67,8 @@ button:disabled {
 .note-btn::after {
   content: "";
   position: absolute;
-  inset: -8px;
-  border-radius: inherit;
+  inset: -11px;
+  border-radius: 18px;
   background: rgb(var(--pulse-color) / 0.8);
   opacity: 0;
   pointer-events: none;
@@ -72,10 +80,10 @@ button:disabled {
 }
 
 @keyframes pulse-overlay {
-  10% {
+  17% {
     opacity: 1;
   }
-  30% {
+  35% {
     opacity: 0.9;
   }
   100% {
@@ -88,44 +96,48 @@ button:disabled {
 }
 
 hr {
-  margin: 40px 0px;
-  border: 1px solid black;
+  margin: 40px 40px;
+  border: 2px solid var(--btn-border);
+}
+
+#trainer-background {
+  margin: auto;
+  background: white;
 }
 
 #trainer {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  margin-top: 20px;
+  justify-content: space-around;
+  max-width: 450px;
+  margin: auto;
+  padding: 40px 0px;
+  background: white;
 }
+
 
 #panel-container {
-  position: relative;
-}
-
-#game-panel {
-  position: absolute;
-  inset: 0;
+  display: grid;
 }
 
 #setup-panel,
-#game-panel {
+#game-panel,
+#post-game-panel {
+  grid-column: 1;
+  grid-row: 1;
+  width: 180px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
   transition: transform 0.3s ease-out, opacity 0.2s ease-out;
 }
 
-#setup-panel.game-in-progress,
-#game-panel:not(.game-in-progress) {
+#setup-panel.hide-panel,
+#game-panel.hide-panel,
+#post-game-panel.hide-panel {
   opacity: 0;
   z-index: -1;
   transform: translateX(-100px);
-}
-
-#setup-panel:not(.game-in-progress),
-#game-panel.game-in-progress {
-  opacity: 1;
 }
 
 .note-control-label {
@@ -141,7 +153,7 @@ hr {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   text-align: center;
 }
 
@@ -173,15 +185,61 @@ hr {
   transform: translateY(-2px);
 }
 
+#game-data-1,
+#game-data-2,
+#post-game-data {
+  min-height: 1.6em;
+}
+
+.game-message-large {
+  font-size: 1.3em;
+  min-height: 1.6em;
+  margin: 40px auto;
+  text-align: center;
+}
+
+#game-instruction {
+  min-height: 3.2em;
+}
+
+#round-complete {
+  margin: 20px auto;
+}
+
+.centered {
+  text-align: center;
+}
+
+#post-game-data {
+  font-size: 1.2em;
+  white-space: pre-line;
+}
+
+.vertical-spaced {
+  margin: 30px auto;
+}
+
 #start-btn,
-#stop-btn {
+#listen-again-btn,
+#new-round-btn {
   padding: 15px;
   margin-top: 15px;
+}
+
+#stop-btn {
+  padding: 9px;
+  margin-top: 40px;
+}
+
+#stop-btn {
+  background: var(--stop-btn-bg);
+  border-color: var(--stop-btn-border);
 }
 
 #note-rows {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
 }
 
@@ -235,4 +293,15 @@ hr {
 
 .ison-slot.show {
   opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  button:enabled:not(:active):hover {
+    background: var(--btn-bg-hover);
+    border-color: var(--btn-border-hover)
+  }
+  button#stop-btn:enabled:not(:active):hover {
+    background: var(--stop-btn-bg-hover);
+    border-color: var(--stop-btn-border-hover);
+  }
 }

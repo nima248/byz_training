@@ -102,6 +102,9 @@ nav a:hover {
 
 .content {
   max-width:580px;
+  margin:auto;
+  padding:30px 40px;
+  background:white;
 }
 
 .hero {
@@ -109,12 +112,6 @@ nav a:hover {
   color:white;
   text-align:center;
   padding:30px 20px 60px 20px;
-}
-
-.content {
-  margin:auto;
-  padding:30px 40px;
-  background:white;
 }
 
 h1 {

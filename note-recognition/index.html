@@ -27,115 +27,129 @@
     <section class="hero">
       <h1>Note recognition</h1>
     </section>
-    <main class="content">
-      <p>
-        An extremely useful ability for chanters is to hear a melody and know <em>which notes</em> are being sung (Νη, Πα, Βου, etc.). This is essential for moving beyond just copying what we hear, towards <em>understanding</em> what we hear and becoming confident solo chanters.
-      </p>
-      <p>
-        This interactive exercise will help you to improve your ability to recognise the differences between different notes in the diatonic scale. Start with the smallest range of notes (just Νη and Πα), and increase the difficulty only when you are comfortable. Practice a little every day for best results!
-      </p>
+    <main>
+      <div class="content">
+        <p>
+          An extremely useful ability for chanters is to hear a melody and know <em>which notes</em> are being sung (Νη, Πα, Βου, etc.). This is essential for moving beyond just copying what we hear, towards <em>understanding</em> what we hear and becoming confident solo chanters.
+        </p>
+        <p>
+          This interactive exercise will help you to improve your ability to recognise the differences between different notes in the diatonic scale. Start with the smallest range of notes (just Νη and Πα), and when you can score 90% or more consistently, add more notes. Practice a little every day for best results!
+        </p>
+      </div>
       <hr>
-      <div id="trainer">
-        <div id="panel-container">
-          <div id="setup-panel">
-            <span class="note-control-label">Highest note</span>
-            <div class="note-control" id="upper-range-control">
-              <button id="highest-down-btn"><span class="minus-symbol">-</span></button>
-              <span class="note-display" id="highest-note-display"></span>
-              <button id="highest-up-btn"><span class="plus-symbol">+</span></button>
+      <div id="trainer-background">
+        <div id="trainer">
+          <div id="panel-container">
+            <div id="setup-panel">
+              <span class="note-control-label">Highest note</span>
+              <div class="note-control" id="upper-range-control">
+                <button id="highest-down-btn"><span class="minus-symbol">-</span></button>
+                <span class="note-display" id="highest-note-display"></span>
+                <button id="highest-up-btn"><span class="plus-symbol">+</span></button>
+              </div>
+              <span class="note-control-label">Lowest note</span>
+              <div class="note-control" id="lower-range-control">
+                <button id="lowest-down-btn"><span class="minus-symbol">-</span></button>
+                <span class="note-display" id="lowest-note-display"></span>
+                <button id="lowest-up-btn"><span class="plus-symbol">+</span></button>
+              </div>
+              <span class="note-control-label">Ison note</span>
+              <div class="note-control" id="ison-control">
+                <button id="ison-down-btn"><span class="minus-symbol">-</span></button>
+                <span class="note-display" id="ison-note-display"></span>
+                <button id="ison-up-btn"><span class="plus-symbol">+</span></button>
+              </div>
+              <button id="start-btn">Start!</button>
             </div>
-            <span class="note-control-label">Lowest note</span>
-            <div class="note-control" id="lower-range-control">
-              <button id="lowest-down-btn"><span class="minus-symbol">-</span></button>
-              <span class="note-display" id="lowest-note-display"></span>
-              <button id="lowest-up-btn"><span class="plus-symbol">+</span></button>
+            <div id="game-panel", class="hide-panel">
+              <div>
+                <div id="game-data-1"></div>
+                <div id="game-data-2"></div>
+                <div id="game-instruction" class="game-message-large"></div>
+              </div>
+              <button id="listen-again-btn">Listen again</button>
+              <button id="stop-btn">End round</button>
             </div>
-            <span class="note-control-label">Ison note</span>
-            <div class="note-control" id="ison-control">
-              <button id="ison-down-btn"><span class="minus-symbol">-</span></button>
-              <span class="note-display" id="ison-note-display"></span>
-              <button id="ison-up-btn"><span class="plus-symbol">+</span></button>
+            <div id="post-game-panel", class="hide-panel">
+              <span id="round-complete" class="game-message-large">Round complete!</span>
+              <div id="post-game-data" class="vertical-spaced centered"></div>
+              <button id="new-round-btn">New round</button>
             </div>
-            <button id="start-btn">Start!</button>
           </div>
-          <div id="game-panel">
-            Game is in progress!
-            <button id="stop-btn">Stop game</button>
-          </div>
-        </div>
-        <div id="spacer"></div>
-        <div id="note-rows">
-          <div id="row-high-di">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="high-di-btn">↑Δι</button>
-          </div>
-          <div id="row-high-ga">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="high-ga-btn">↑Γα</button>
-          </div>
-          <div id="row-high-bou">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="high-bou-btn">↑Βου</button>
-          </div>
-          <div id="row-high-pa">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="high-pa-btn">↑Πα</button>
-          </div>
-          <div id="row-high-ni">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="high-ni-btn">↑Νη</button>
-          </div>
-          <div id="row-high-zo">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="high-zo-btn">↑Ζω</button>
-          </div>
-          <div id="row-high-zo-flat">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="high-zo-flat-btn">↑Ζω<span class="fthora-space"><span class="enharmonic-fthora">p</span></span></button>
-          </div>
-          <div id="row-ke">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="ke-btn">Κε</button>
-          </div>
-          <div id="row-di">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="di-btn">Δι</button>
-          </div>
-          <div id="row-ga">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="ga-btn">Γα</button>
-          </div>
-          <div id="row-bou">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="bou-btn">Βου</button>
-          </div>
-          <div id="row-pa">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="pa-btn">Πα</button>
-          </div>
-          <div id="row-ni">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="ni-btn">Νη</button>
-          </div>
-          <div id="row-zo">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="zo-btn">Ζω</button>
-          </div>
-          <div id="row-zo-flat">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="zo-flat-btn">Ζω<span class="fthora-space"><span class="enharmonic-fthora">p</span></span></button>
-          </div>
-          <div id="row-low-ke">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="low-ke-btn">↓Κε</button>
-          </div>
-          <div id="row-low-di">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="low-di-btn">↓Δι</button>
-          </div>
-          <div id="row-low-ga">
-            <span class="ison-slot">0</span>
-            <button class="note-btn" id="low-ga-btn">↓Γα</button>
+          <div id="spacer"></div>
+          <div id="note-rows">
+            <div id="row-high-di">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="high-di-btn">↑Δι</button>
+            </div>
+            <div id="row-high-ga">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="high-ga-btn">↑Γα</button>
+            </div>
+            <div id="row-high-bou">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="high-bou-btn">↑Βου</button>
+            </div>
+            <div id="row-high-pa">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="high-pa-btn">↑Πα</button>
+            </div>
+            <div id="row-high-ni">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="high-ni-btn">↑Νη</button>
+            </div>
+            <div id="row-high-zo">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="high-zo-btn">↑Ζω</button>
+            </div>
+            <div id="row-high-zo-flat">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="high-zo-flat-btn">↑Ζω<span class="fthora-space"><span class="enharmonic-fthora">p</span></span></button>
+            </div>
+            <div id="row-ke">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="ke-btn">Κε</button>
+            </div>
+            <div id="row-di">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="di-btn">Δι</button>
+            </div>
+            <div id="row-ga">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="ga-btn">Γα</button>
+            </div>
+            <div id="row-bou">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="bou-btn">Βου</button>
+            </div>
+            <div id="row-pa">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="pa-btn">Πα</button>
+            </div>
+            <div id="row-ni">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="ni-btn">Νη</button>
+            </div>
+            <div id="row-zo">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="zo-btn">Ζω</button>
+            </div>
+            <div id="row-zo-flat">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="zo-flat-btn">Ζω<span class="fthora-space"><span class="enharmonic-fthora">p</span></span></button>
+            </div>
+            <div id="row-low-ke">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="low-ke-btn">↓Κε</button>
+            </div>
+            <div id="row-low-di">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="low-di-btn">↓Δι</button>
+            </div>
+            <div id="row-low-ga">
+              <span class="ison-slot">0</span>
+              <button class="note-btn" id="low-ga-btn">↓Γα</button>
+            </div>
           </div>
         </div>
       </div>

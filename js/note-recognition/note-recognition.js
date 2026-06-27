@@ -29,19 +29,27 @@ const NOTES = [
 
 // Uses CSS rgb syntax
 const COLORS = {
-  played: "180 190 255",
+  played: "140 150 215",
   correct: "30 240 40",
-  incorrect: "190 40 20",
+  incorrect: "220 40 20",
+};
+
+const GAME_INSTRUCTIONS = {
+  listen: "Listen...",
+  provideAnswer: "What was the second note?",
+  roundComplete: "Round complete!",
 };
 
 const NOTE_DIV_ENABLED_CLASS = "note-div-enabled";
-const GAME_IN_PROGRESS_CLASS = "game-in-progress";
+const HIDE_PANEL_CLASS = "hide-panel";
 const PULSE_ANIMATION_CLASS = "pulse";
 const ISON_SHOW_CLASS = "show";
 const ISON_VOLUME = 0.4;
+const N_QUESTIONS = 10;
 
 const setupPanel = document.querySelector("#setup-panel");
 const gamePanel = document.querySelector("#game-panel");
+const postGamePanel = document.querySelector("#post-game-panel");
 
 const highestDownBtn = document.querySelector("#highest-down-btn");
 const highestUpBtn = document.querySelector("#highest-up-btn");
@@ -53,10 +61,17 @@ const isonDownBtn = document.querySelector("#ison-down-btn");
 const isonUpBtn = document.querySelector("#ison-up-btn");
 const isonNoteDisplay = document.querySelector("#ison-note-display");
 const startBtn = document.querySelector("#start-btn");
+const listenAgainButton = document.querySelector("#listen-again-btn");
 const stopBtn = document.querySelector("#stop-btn");
+const newRoundBtn = document.querySelector("#new-round-btn");
 
 const noteButtonContainer = document.querySelector("#note-rows");
 const noteButtons = document.querySelectorAll(".note-btn");
+
+const gameInstructionDiv = document.querySelector("#game-instruction");
+const gameData1Div = document.querySelector("#game-data-1");
+const gameData2Div = document.querySelector("#game-data-2");
+const postGameDataDiv = document.querySelector("#post-game-data");
 
 const sampleBank = new SampleBank(
   "https://audio.byzison.xyz/",
@@ -125,11 +140,9 @@ function updateSetupPanelNoteDisplay(displayElement, noteIndex) {
 }
 
 async function startRound() {
-  setupPanel.classList.add(GAME_IN_PROGRESS_CLASS);
-  gamePanel.classList.add(GAME_IN_PROGRESS_CLASS);
-  setupPanel.disabled = true;
-  gamePanel.disabled = false;
-  enableNoteButtons(false);
+  showPanel(gamePanel);
+  enableResponseButtons(false);
+  setGameInstructions(GAME_INSTRUCTIONS.listen);
 
   const [notes, isonNote] = getActiveNotes();
   await loadAudio(notes, isonNote);
@@ -138,13 +151,26 @@ async function startRound() {
   gameRound = new GameRound({
     melodyNotes: notes,
     isonNote: isonNote,
-    nQuestions: 10,
+    nQuestions: N_QUESTIONS,
     playIsonCallback: playIsonCallback,
     playMelodyCallback: playMelodyCallback,
     readyForAnswerCallback: readyForAnswerCallback,
+    reportRoundStateCallback: reportRoundStateCallback,
     playIsonFirst: true,
   });
   await gameRound.playRound();
+}
+
+function showPanel(panelDiv) {
+  console.debug(`showing ${panelDiv.id}`);
+  [setupPanel, gamePanel, postGamePanel].forEach((p) => {
+    if (p != panelDiv) {
+      p.classList.add(HIDE_PANEL_CLASS);
+      p.disabled = true;
+    }
+  });
+  panelDiv.classList.remove(HIDE_PANEL_CLASS);
+  panelDiv.disabled = false;
 }
 
 function getActiveNotes() {
@@ -168,22 +194,52 @@ async function loadAudio(notes, isonNote) {
 }
 
 function playIsonCallback(note) {
-  isonSampler.playFrequency(noteFrequency(note));
+  if (note) {
+    isonSampler.playFrequency(noteFrequency(note));
+  } else {
+    isonSampler.stop();
+  }
 }
 
-function playMelodyCallback(note, flashButton) {
-  melodySampler.playFrequency(noteFrequency(note));
-  if (flashButton) {
-    const button = document.querySelector(`#${note}-btn`);
-    pulseButton(button, COLORS["played"]);
+function playMelodyCallback(note, flashButton = false) {
+  if (note) {
+    melodySampler.playFrequency(noteFrequency(note));
+    if (flashButton) {
+      const button = document.querySelector(`#${note}-btn`);
+      pulseButton(button, COLORS["played"]);
+    }
+  } else {
+    melodySampler.stop();
   }
 }
 
 function readyForAnswerCallback(ready) {
-  enableNoteButtons(ready);
+  enableResponseButtons(ready);
+  setGameInstructions(
+    ready ? GAME_INSTRUCTIONS.provideAnswer : GAME_INSTRUCTIONS.listen,
+  );
 }
 
-function enableNoteButtons(enable) {
+function reportRoundStateCallback(data) {
+  if (data.nAnswers < data.totalQuestions) {
+    gameData1Div.innerHTML = `Question ${data.currentQuestion} of ${data.totalQuestions}`;
+    gameData2Div.innerHTML = `Correct: ${data.nCorrectAnswers}/${data.nAnswers}`;
+  } else {
+    showPanel(postGamePanel);
+    const correct = data.nCorrectAnswers;
+    const total = data.nAnswers;
+    const percent = ((correct / total) * 100).toFixed(0);
+    postGameDataDiv.textContent = `Your score:\n${correct}/${total}\n(${percent}%)`;
+    stopGame();
+  }
+}
+
+function setGameInstructions(instructions) {
+  gameInstructionDiv.innerHTML = instructions;
+}
+
+function enableResponseButtons(enable) {
+  listenAgainButton.disabled = !enable;
   noteButtons.forEach((button) => {
     button.disabled = !enable;
   });
@@ -212,11 +268,7 @@ function noteFrequency(note) {
 }
 
 function stopGame() {
-  setupPanel.classList.remove(GAME_IN_PROGRESS_CLASS);
-  gamePanel.classList.remove(GAME_IN_PROGRESS_CLASS);
-  setupPanel.disabled = false;
-  gamePanel.disabled = true;
-  enableNoteButtons(true);
+  enableResponseButtons(true);
   isonSampler.stop();
   melodySampler.stop();
   gameRound.stop();
@@ -316,6 +368,11 @@ startBtn.addEventListener("click", async () => {
 
 stopBtn.addEventListener("click", () => {
   stopGame();
+  showPanel(setupPanel);
+});
+
+newRoundBtn.addEventListener("click", () => {
+  showPanel(setupPanel);
 });
 
 noteButtonContainer.addEventListener("click", (event) => {
@@ -338,6 +395,12 @@ noteButtonContainer.addEventListener("click", (event) => {
   }
 });
 
+listenAgainButton.addEventListener("click", () => {
+  if (gameRound != null) {
+    gameRound.playMelodyAgain();
+  }
+});
+
 let lowestNoteIndex = indexOfNote("ni");
 let highestNoteIndex = indexOfNote("pa");
 let isonNoteIndex = lowestNoteIndex;
@@ -347,5 +410,6 @@ for (let i = lowestNoteIndex; i <= highestNoteIndex; i++) {
   enableNote(i);
 }
 
+showPanel(setupPanel);
 loadAudio(...getActiveNotes());
 updateSetupPanelUI();
