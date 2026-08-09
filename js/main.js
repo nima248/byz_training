@@ -1,3 +1,5 @@
+import "./debug.js";
+
 const menuHamburger = document.getElementById("menu-toggle");
 const navLinks = document.getElementById("nav-links");
 const body = document.querySelector("body");
