@@ -35,6 +35,15 @@
         <p>
           This interactive exercise will help you to improve your ability to recognise the differences between different notes in the diatonic scale. Start with the smallest range of notes (just Νη and Πα), and when you can score 90% or more consistently, add more notes. Practice a little every day for best results!
         </p>
+        <p>
+          <b>Change log:</b>
+          <ul>
+            <li><b>Aug 2026:</b> Add "spread mode" which uses only every second note, making it easier to distinguish between notes. A helpful option for beginners.</li>
+            <li><b>Aug 2026:</b> Your settings are saved and recalled. Less annoying!</li>
+          </ul>
+        </p>
+      </div>
+      <div>
       </div>
       <hr>
       <div id="trainer-background">
@@ -58,6 +67,12 @@
                 <button id="ison-down-btn"><span class="minus-symbol">-</span></button>
                 <span class="note-display" id="ison-note-display"></span>
                 <button id="ison-up-btn"><span class="plus-symbol">+</span></button>
+              </div>
+              <span class="note-control-label">
+                <label for="spread-mode">Spread mode</label>
+              </span>
+              <div class="note-control">
+                <input type="checkbox" id="spread-mode-checkbox" name="spread-mode" value="use-spread-mode">
               </div>
               <button id="start-btn">Start!</button>
             </div>
