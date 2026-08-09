@@ -47,6 +47,22 @@ const ISON_SHOW_CLASS = "show";
 const ISON_VOLUME = 0.4;
 const N_QUESTIONS = 10;
 
+const SETTINGS_LOCAL_STORAGE = "note-recognition-settings";
+
+const saved_settings = localStorage.getItem(SETTINGS_LOCAL_STORAGE);
+let settings;
+if (saved_settings) {
+  settings = JSON.parse(saved_settings);
+  console.log("Loading saved settings:");
+  console.log(settings);
+} else {
+  settings = {
+    ison_note: "ni",
+    lowest_note: "ni",
+    highest_note: "pa",
+  };
+}
+
 const setupPanel = document.querySelector("#setup-panel");
 const gamePanel = document.querySelector("#game-panel");
 const postGamePanel = document.querySelector("#post-game-panel");
@@ -275,6 +291,11 @@ function stopGame() {
   gameRound = null;
 }
 
+function writeSetting(settingName, value) {
+  settings[settingName] = value;
+  localStorage.setItem(SETTINGS_LOCAL_STORAGE, JSON.stringify(settings));
+}
+
 if (window.matchMedia("(pointer: coarse)").matches) {
   document.querySelectorAll("button").forEach((button) => {
     button.addEventListener("touchend", () => {
@@ -290,6 +311,7 @@ lowestDownBtn.addEventListener("click", () => {
     return;
   }
   lowestNoteIndex -= 1;
+  writeSetting("lowest_note", NOTES[lowestNoteIndex]);
   enableNote(lowestNoteIndex);
 });
 
@@ -299,9 +321,11 @@ lowestUpBtn.addEventListener("click", () => {
     return;
   }
   lowestNoteIndex += 1;
+  writeSetting("lowest_note", NOTES[lowestNoteIndex]);
   enableNote(lowestNoteIndex - 1, false);
   if (isonNoteIndex < lowestNoteIndex) {
     setIsonNote(lowestNoteIndex);
+    writeSetting("ison_note", NOTES[isonNoteIndex]);
   }
 });
 
@@ -311,9 +335,11 @@ highestDownBtn.addEventListener("click", () => {
     return;
   }
   highestNoteIndex -= 1;
+  writeSetting("highest_note", NOTES[highestNoteIndex]);
   enableNote(highestNoteIndex + 1, false);
   if (isonNoteIndex > highestNoteIndex) {
     setIsonNote(highestNoteIndex);
+    writeSetting("ison_note", NOTES[isonNoteIndex]);
   }
 });
 
@@ -323,6 +349,7 @@ highestUpBtn.addEventListener("click", () => {
     return;
   }
   highestNoteIndex += 1;
+  writeSetting("highest_note", NOTES[highestNoteIndex]);
   enableNote(highestNoteIndex);
 });
 
@@ -332,6 +359,7 @@ isonDownBtn.addEventListener("click", () => {
     return;
   }
   setIsonNote(isonNoteIndex - 1);
+  writeSetting("ison_note", NOTES[isonNoteIndex]);
 });
 
 isonUpBtn.addEventListener("click", () => {
@@ -340,6 +368,7 @@ isonUpBtn.addEventListener("click", () => {
     return;
   }
   setIsonNote(isonNoteIndex + 1);
+  writeSetting("ison_note", NOTES[isonNoteIndex]);
 });
 
 setupPanel.addEventListener("click", (event) => {
@@ -401,9 +430,9 @@ listenAgainButton.addEventListener("click", () => {
   }
 });
 
-let lowestNoteIndex = indexOfNote("ni");
-let highestNoteIndex = indexOfNote("pa");
-let isonNoteIndex = lowestNoteIndex;
+let lowestNoteIndex = indexOfNote(settings.lowest_note);
+let highestNoteIndex = indexOfNote(settings.highest_note);
+let isonNoteIndex = indexOfNote(settings.ison_note);
 
 setIsonNote(isonNoteIndex);
 for (let i = lowestNoteIndex; i <= highestNoteIndex; i++) {
