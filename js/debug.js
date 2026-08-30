@@ -11,7 +11,7 @@ const DEBUG_ENABLED = new URLSearchParams(location.search).has("debug");
     return String(v);
   }
 
-  function addLog(level, args) {
+  function addConsoleLog(level, args) {
     const time = new Date().toTimeString().split(" ")[0];
     const text = args.map(formatValue).join(" ");
     state.logs.push({
@@ -20,6 +20,27 @@ const DEBUG_ENABLED = new URLSearchParams(location.search).has("debug");
       text: text,
     });
     debugContent.textContent += `[${time}] ${level.toUpperCase()}\n${text}\n\n`;
+  }
+
+  function addErrorLog(event) {
+    state.logs.push({
+      level: "error",
+      message: event.message,
+      filename: event.filename,
+      line: event.lineno,
+      column: event.colno,
+      stack: event.error?.stack,
+    });
+    debugContent.textContent += `ERROR\n${event.message}\n${event.filename}:${event.lineno}:${event.colno}\nStack:\n${event.error?.stack}\n\n`;
+  }
+
+  function addUnhandledRejectionLog(event) {
+    state.logs.push({
+      level: "promise",
+      reason: String(event.reason),
+      stack: event.reason?.stack,
+    });
+    debugContent.textContent += `PROMISE\n${String(event.reason)}\nStack:\n${event.reason?.stack}`;
   }
 
   function generateDebugText() {
@@ -108,12 +129,23 @@ Started: ${state.diagnostics.started}\n\n`;
     const original = console[level];
 
     console[level] = (...args) => {
-      addLog(level, args);
+      addConsoleLog(level, args);
       original.apply(console, args);
     };
   }
-  //hookConsole();
-  //hookErrors();
+
+  window.addEventListener("error", (event) => {
+    addErrorLog(event);
+  });
+
+  window.addEventListener("unhandledrejection", (event) => {
+    addUnhandledRejectionLog(event);
+    logs.push({
+      level: "promise",
+      reason: String(event.reason),
+      stack: event.reason?.stack,
+    });
+  });
 })();
 
 function createOverlay() {
