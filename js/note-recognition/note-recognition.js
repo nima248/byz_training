@@ -1,4 +1,4 @@
-import { SampleBank } from "../../lib/byz-audio/src/SampleBank.js";
+import { SampleBank } from "../../lib/byz-audio/src/SampleBank.js?v=2";
 import { BasicSampler } from "../../lib/byz-audio/src/BasicSampler.js";
 import { LayerSampler } from "../../lib/byz-audio/src/LayerSampler.js";
 import { ScaleManager } from "../../lib/byz-audio/src/ScaleManager.js";
@@ -363,6 +363,10 @@ setupPanel.addEventListener("click", (event) => {
 });
 
 startBtn.addEventListener("click", async () => {
+  console.log("Start button pressed", {
+    howlerState: Howler.ctx?.state,
+    time: performance.now(),
+  });
   await startRound();
 });
 

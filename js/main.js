@@ -1,4 +1,5 @@
-import "./debug.js";
+import { logger } from "./logger.js";
+import "./debug.js?v=2";
 
 const menuHamburger = document.getElementById("menu-toggle");
 const navLinks = document.getElementById("nav-links");
